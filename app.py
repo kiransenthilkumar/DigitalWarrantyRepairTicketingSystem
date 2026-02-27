@@ -111,6 +111,12 @@ def create_app(config_name=None):
     
     return app
 
+
+# expose an application instance for WSGI servers that expect a module-level
+# variable named `app`. This allows using "gunicorn app:app" without an
+# explicit factory call. The factory still respects FLASK_ENV.
+app = create_app()
+
 if __name__ == '__main__':
     app = create_app()
     # Disable the reloader to avoid repeated initialization issues; in
