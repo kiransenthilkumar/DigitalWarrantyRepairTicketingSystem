@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}User Details - Warranty System{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <a href="{{ url_for('admin.users') }}" class="inline-flex items-center px-3 py-2 mb-4 bg-slate-600 text-white rounded-md hover:opacity-90">
+        <i class="fas fa-arrow-left mr-2"></i> Back
+    </a>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <div class="bg-white shadow rounded mb-4">
+                <div class="px-4 py-3 bg-primary text-white">
+                    <h4 class="mb-0">{{ user.full_name }}</h4>
+                </div>
+                <div class="p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Phone:</strong> {{ user.phone or 'Not provided' }}</p>
+                        </div>
+                        <div>
+                            <p><strong>Role:</strong> <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">{{ user.role|upper }}</span></p>
+                            <p><strong>Status:</strong> <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full {% if user.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">{{ 'Active' if user.is_active else 'Inactive' }}</span></p>
+                            <p><strong>Member Since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="flex gap-2">
+                        <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90 inline-flex items-center">
+                            <i class="fas fa-edit mr-2"></i> Edit
+                        </a>
+                        {% if user.is_active %}
+                        <form method="POST" action="{{ url_for('admin.deactivate_user', user_id=user.id) }}" class="inline-block" onsubmit="return confirm('Deactivate this user?')">
+                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:opacity-90 inline-flex items-center">
+                                <i class="fas fa-ban mr-2"></i> Deactivate
+                            </button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('admin.activate_user', user_id=user.id) }}" class="inline-block">
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90 inline-flex items-center">
+                                <i class="fas fa-check mr-2"></i> Activate
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="bg-white shadow rounded">
+                <div class="px-4 py-2 bg-slate-600 text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar mr-2"></i> Statistics</h5>
+                </div>
+                <div class="p-4">
+                    {% if user.is_customer() %}
+                        <p><strong>Total Products:</strong> {{ products_count }}</p>
+                        <p><strong>Total Tickets:</strong> {{ tickets_count }}</p>
+                    {% elif user.is_technician() %}
+                        <p><strong>Assigned Tickets:</strong> {{ assigned_tickets }}</p>
+                        <p><strong>Completed Tickets:</strong> {{ completed_tickets }}</p>
+                        <p><strong>Avg Rating:</strong> {{ "%.1f"|format(avg_rating) if avg_rating else 'N/A' }} ⭐</p>
+                    {% else %}
+                        <p class="text-slate-600">Admin user</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

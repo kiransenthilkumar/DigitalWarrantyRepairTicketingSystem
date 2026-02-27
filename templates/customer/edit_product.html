@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Product - Warranty System{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow rounded p-6">
+        <h2 class="text-xl font-semibold mb-4">Edit Product</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    {{ form.product_name.label(class='block text-sm font-medium') }}
+                    {{ form.product_name(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.brand.label(class='block text-sm font-medium') }}
+                    {{ form.brand(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.category.label(class='block text-sm font-medium') }}
+                    {{ form.category(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.serial_number.label(class='block text-sm font-medium') }}
+                    {{ form.serial_number(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.purchase_date.label(class='block text-sm font-medium') }}
+                    {{ form.purchase_date(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.warranty_months.label(class='block text-sm font-medium') }}
+                    {{ form.warranty_months(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ form.description.label(class='block text-sm font-medium') }}
+                {{ form.description(class='mt-1 block w-full rounded-md border-gray-200', rows=4) }}
+            </div>
+
+            <div class="mt-4">
+                <label class="block text-sm font-medium">Current Invoice</label>
+                <div class="mt-2">
+                    {% if product.invoice_image %}
+                        <img src="{{ url_for('static', filename=product.invoice_image) }}" class="w-40 h-40 object-cover rounded-md" alt="invoice">
+                    {% else %}
+                        <div class="w-40 h-40 bg-slate-100 flex items-center justify-center rounded-md">No image</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ form.invoice_image.label(class='block text-sm font-medium') }}
+                {{ form.invoice_image(class='mt-1') }}
+                <p class="text-sm text-slate-500">Upload a new invoice image to replace the current one.</p>
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-accent text-white rounded-md">Save</button>
+                <a href="{{ url_for('customer.product_detail', product_id=product.id) }}" class="px-4 py-2 border rounded-md">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

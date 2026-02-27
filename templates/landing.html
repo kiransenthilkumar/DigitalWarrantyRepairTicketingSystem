@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Warranty System{% endblock %}
+
+{% block content %}
+<div class="relative bg-gradient-to-br from-accent to-primary text-white overflow-hidden">
+    <div class="absolute inset-0 opacity-40 bg-gradient-to-br from-primary to-accent"></div>
+    <!-- decorative circles -->
+    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white opacity-10 rounded-full"></div>
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 py-24">
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold leading-tight drop-shadow-lg">Digital Warranty & Repair System</h1>
+        <p class="mt-6 max-w-3xl text-xl sm:text-2xl">Manage warranties, raise repair tickets, and track progress effortlessly. Empower customers and technicians with a unified platform.</p>
+        <div class="mt-10 space-x-4">
+            <a href="{{ url_for('auth.login') }}" class="px-10 py-4 bg-white text-accent font-semibold rounded-lg shadow hover:bg-gray-100 transition">Login</a>
+            <a href="{{ url_for('auth.register') }}" class="px-10 py-4 border border-white text-white font-semibold rounded-lg hover:bg-white hover:text-accent transition">Register</a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center text-primary mb-12">Key Features</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="text-center">
+                <i class="fas fa-calendar-check text-4xl text-accent mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Warranty Management</h3>
+                <p class="text-slate-600">Keep track of product warranties and expiration dates in one place.</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-ticket-alt text-4xl text-accent mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Ticket Tracking</h3>
+                <p class="text-slate-600">Raise and monitor repair tickets with status updates and history.</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-tools text-4xl text-accent mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Technician Dashboard</h3>
+                <p class="text-slate-600">Assign jobs to technicians and track their progress efficiently.</p>
+            </div>
+            <div class="text-center">
+                <i class="fas fa-chart-bar text-4xl text-accent mb-4"></i>
+                <h3 class="text-xl font-semibold mb-2">Analytics & Reports</h3>
+                <p class="text-slate-600">View insights on tickets, costs, and performance with charts.</p>
+            </div>
+        </div>
+        <!-- Testimonials -->
+        <div class="mt-16">
+            <h2 class="text-2xl font-bold text-center text-primary mb-8">What Our Users Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-slate-50 p-6 rounded-lg shadow">
+                    <p class="text-slate-700 italic">"This platform simplified our warranty tracking and saved us hours of work every week."</p>
+                    <p class="mt-4 font-semibold">— Alice, Store Manager</p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-lg shadow">
+                    <p class="text-slate-700 italic">"Technicians love the dashboard. I can assign and monitor repairs easily."</p>
+                    <p class="mt-4 font-semibold">— Bob, Lead Technician</p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-lg shadow">
+                    <p class="text-slate-700 italic">"Customers feel more confident when they see ticket progress and payment details."</p>
+                    <p class="mt-4 font-semibold">— Carol, Customer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-primary text-white py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <p>&copy; {{ now().year }} Digital Warranty System. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- CTA Footer -->
+<footer class="bg-accent text-white py-12">
+    <div class="max-w-4xl mx-auto text-center">
+        <h3 class="text-2xl font-semibold mb-4">Ready to streamline your warranty process?</h3>
+        <p class="mb-6">Sign up today and start managing repairs like a pro.</p>
+        <a href="{{ url_for('auth.register') }}" class="px-8 py-3 bg-white text-accent font-semibold rounded-md hover:bg-gray-100">Get Started</a>
+    </div>
+</footer>
+{% endblock %}

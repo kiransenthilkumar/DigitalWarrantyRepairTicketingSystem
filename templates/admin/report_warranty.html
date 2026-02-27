@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Warranty Report - Warranty System{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <h2 class="text-2xl font-semibold mb-4"><i class="fas fa-certificate mr-2"></i>Warranty Status Report</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow text-center p-4">
+            <h5 class="font-semibold">Active Warranties</h5>
+            <h2 class="text-green-600 text-2xl">{{ active_count }}</h2>
+        </div>
+        <div class="bg-white rounded-lg shadow text-center p-4">
+            <h5 class="font-semibold">Expiring Soon</h5>
+            <h2 class="text-yellow-500 text-2xl">{{ expiring_count }}</h2>
+        </div>
+        <div class="bg-white rounded-lg shadow text-center p-4">
+            <h5 class="font-semibold">Expired</h5>
+            <h2 class="text-red-600 text-2xl">{{ expired_count }}</h2>
+        </div>
+    </div>
+
+    {% if expiring_products %}
+    <div class="bg-white shadow rounded">
+        <div class="px-4 py-2 bg-yellow-500 text-black flex items-center">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <span>Products Expiring Soon (30 days)</span>
+        </div>
+        <div class="overflow-x-auto p-4">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-100">
+                    <tr>
+                        <th class="py-2 px-3 text-left">Product Name</th>
+                        <th class="py-2 px-3 text-left">Serial Number</th>
+                        <th class="py-2 px-3 text-left">Owner</th>
+                        <th class="py-2 px-3 text-left">Warranty Expiry</th>
+                        <th class="py-2 px-3 text-left">Days Remaining</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in expiring_products %}
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="py-2 px-3">{{ product.product_name }}</td>
+                        <td class="py-2 px-3">{{ product.serial_number }}</td>
+                        <td class="py-2 px-3">{{ product.owner.full_name }}</td>
+                        <td class="py-2 px-3">{{ product.warranty_expiry.strftime('%B %d, %Y') }}</td>
+                        <td class="py-2 px-3"><span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">{{ product.days_remaining }} days</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

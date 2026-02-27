@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Product Details - Warranty System{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <a href="{{ url_for('customer.products') }}" class="inline-flex items-center px-3 py-2 mb-4 border rounded-md">
+        <i class="fas fa-arrow-left mr-2"></i> Back
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            {% if product.warranty_status == 'expired' %}
+            <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-red-900">Warranty Expired</h3>
+                        <p class="text-sm text-red-700 mt-1">This product's warranty expired on {{ product.warranty_expiry.strftime('%B %d, %Y') }}. You can still create repair tickets, but they will be charged as paid repairs.</p>
+                    </div>
+                </div>
+            </div>
+            {% elif product.warranty_status == 'expiring_soon' %}
+            <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-circle text-yellow-600 text-xl mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-yellow-900">Warranty Expiring Soon</h3>
+                        <p class="text-sm text-yellow-700 mt-1">Your warranty expires in {{ product.days_remaining }} days on {{ product.warranty_expiry.strftime('%B %d, %Y') }}. Create support tickets before expiry to claim warranty coverage.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="bg-white shadow rounded p-6">
+                <div class="flex items-start gap-6">
+                    <div class="w-48 h-48 bg-slate-100 rounded overflow-hidden">
+                        {% if product.invoice_image %}
+                            <img src="{{ url_for('static', filename=product.invoice_image) }}" class="w-full h-full object-cover" alt="invoice">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-slate-400">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-semibold">{{ product.product_name }}</h2>
+                        <p class="text-sm text-slate-500">{{ product.brand }} • {{ product.category|title }}</p>
+                        <p class="text-sm text-slate-400 mt-2">Serial: {{ product.serial_number }}</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-sm text-slate-500">Purchase Date</div>
+                        <div class="font-medium">{{ product.purchase_date.strftime('%B %d, %Y') }}</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-slate-500">Warranty</div>
+                        <div class="font-medium">{{ product.warranty_months }} months — Expires {{ product.warranty_expiry.strftime('%B %d, %Y') }}</div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md {% if product.warranty_status == 'active' %}bg-green-100 text-green-800{% elif product.warranty_status == 'expiring_soon' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ product.warranty_status|replace('_', ' ')|upper }}
+                    </div>
+                    {% if product.warranty_status in ['active','expiring_soon'] %}
+                        <div class="text-sm text-slate-500 mt-2">{{ product.days_remaining }} days remaining</div>
+                    {% endif %}
+                </div>
+
+                {% if product.description %}
+                <div class="mt-6">
+                    <h3 class="text-sm font-medium text-slate-700">Description</h3>
+                    <p class="mt-2 text-slate-600">{{ product.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded p-4">
+            <h4 class="font-semibold mb-3">Related Tickets</h4>
+            {% if tickets %}
+                <div class="space-y-2">
+                    {% for ticket in tickets %}
+                        <a href="{{ url_for('customer.ticket_detail', ticket_id=ticket.id) }}" class="block p-3 border rounded hover:bg-slate-50">
+                            <div class="flex justify-between items-center">
+                                <div class="font-medium">{{ ticket.ticket_number }}</div>
+                                <div class="text-xs rounded px-2 py-1 {% if ticket.status == 'completed' %}bg-green-100 text-green-800{% elif ticket.status == 'in_progress' %}bg-yellow-100 text-yellow-800{% elif ticket.status == 'open' %}bg-red-100 text-red-800{% else %}bg-slate-100 text-slate-700{% endif %}">{{ ticket.status|replace('_',' ')|upper }}</div>
+                            </div>
+                            <div class="text-sm text-slate-500">{{ ticket.created_at.strftime('%b %d, %H:%M') }}</div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-slate-500">No tickets for this product yet.</p>
+            {% endif %}
+
+            <div class="mt-4">
+                <a href="{{ url_for('customer.raise_ticket') }}" class="w-full inline-flex items-center justify-center px-3 py-2 bg-accent text-white rounded-md">Create Ticket</a>
+            </div>
+
+            <div class="mt-4 space-y-2">
+                <a href="{{ url_for('customer.edit_product', product_id=product.id) }}" class="block text-center px-3 py-2 border rounded">Edit Product</a>
+                <form method="POST" action="{{ url_for('customer.delete_product', product_id=product.id) }}" onsubmit="return confirm('Delete this product?');">
+                    <button type="submit" class="w-full text-center px-3 py-2 text-red-600 border border-red-100 rounded">Delete Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

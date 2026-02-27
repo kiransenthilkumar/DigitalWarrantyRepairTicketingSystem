@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Pay Repair - Warranty System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12">
+    <div class="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold">Payment for {{ ticket.ticket_number }}</h3>
+            <a href="{{ url_for('customer.ticket_detail', ticket_id=ticket.id) }}" class="text-gray-500 hover:text-gray-700"><i class="fas fa-arrow-left"></i></a>
+        </div>
+        <div class="text-center mb-6">
+            <p class="text-gray-600">Amount due</p>
+            <div class="text-3xl font-bold text-green-600">₹{{ ticket.repair_cost }}</div>
+        </div>
+        <form method="post" class="space-y-4">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.upi_id.label(class='block text-sm font-medium mb-1') }}
+                {{ form.upi_id(class='mt-1 block w-full rounded-md border-gray-300 p-2', placeholder='example@upi') }}
+                {% if form.upi_id.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.upi_id.errors[0] }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="w-full py-2 bg-primary text-white rounded-md font-semibold hover:bg-primary-dark transition">Pay Now</button>
+            <a href="{{ url_for('customer.ticket_detail', ticket_id=ticket.id) }}" class="block text-center text-gray-600 hover:underline">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

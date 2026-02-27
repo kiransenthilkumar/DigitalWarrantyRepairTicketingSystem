@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Users - Warranty System{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold"><i class="fas fa-users mr-2"></i> User Management</h2>
+        <a href="{{ url_for('admin.search') }}" class="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90"><i class="fas fa-search mr-1"></i> Search Users</a>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-white shadow rounded p-4 mb-6">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-semibold mb-2">Filter by Role</label>
+                <select name="role" class="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring focus:ring-primary">
+                    <option value="">All Roles</option>
+                    <option value="customer" {% if role_filter == 'customer' %}selected{% endif %}>Customer</option>
+                    <option value="technician" {% if role_filter == 'technician' %}selected{% endif %}>Technician</option>
+                    <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+                </select>
+            </div>
+            <div class="flex items-end gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-md hover:opacity-90">Filter</button>
+                <a href="{{ url_for('admin.users') }}" class="flex-1 px-4 py-2 bg-slate-600 text-white rounded-md hover:opacity-90 text-center">Clear</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="bg-white shadow rounded overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-semibold">Username</th>
+                        <th class="px-4 py-2 text-left font-semibold">Email</th>
+                        <th class="px-4 py-2 text-left font-semibold">Full Name</th>
+                        <th class="px-4 py-2 text-left font-semibold">Role</th>
+                        <th class="px-4 py-2 text-left font-semibold">Status</th>
+                        <th class="px-4 py-2 text-left font-semibold">Joined</th>
+                        <th class="px-4 py-2 text-left font-semibold">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users.items %}
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="px-4 py-2">{{ user.username }}</td>
+                        <td class="px-4 py-2">{{ user.email }}</td>
+                        <td class="px-4 py-2">{{ user.full_name }}</td>
+                        <td class="px-4 py-2"><span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-cyan-100 text-cyan-800">{{ user.role|upper }}</span></td>
+                        <td class="px-4 py-2">
+                            {% if user.is_active %}
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2">{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                        <td class="px-4 py-2">
+                            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="px-3 py-1 bg-primary text-white rounded text-sm hover:opacity-90">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if users.pages > 1 %}
+    <nav aria-label="Page navigation" class="flex justify-center mt-6">
+        <ul class="flex gap-2">
+            {% if users.has_prev %}
+            <li>
+                <a class="px-3 py-2 border border-slate-300 rounded hover:bg-slate-100" href="{{ url_for('admin.users', page=users.prev_num, role=role_filter) }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in users.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == users.page %}
+                    <li><span class="px-3 py-2 bg-primary text-white rounded">{{ page_num }}</span></li>
+                    {% else %}
+                    <li>
+                        <a class="px-3 py-2 border border-slate-300 rounded hover:bg-slate-100" href="{{ url_for('admin.users', page=page_num, role=role_filter) }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li><span class="px-3 py-2 text-slate-400">...</span></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if users.has_next %}
+            <li>
+                <a class="px-3 py-2 border border-slate-300 rounded hover:bg-slate-100" href="{{ url_for('admin.users', page=users.next_num, role=role_filter) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}My Tickets - Warranty System{% endblock %}
+
+{% block content %}
+<div class="p-6 space-y-6">
+    <!-- Header and actions -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h2 class="text-3xl font-bold"><i class="fas fa-list-alt mr-2"></i> My Tickets</h2>
+        <a href="{{ url_for('customer.raise_ticket') }}" class="inline-flex items-center px-5 py-2 bg-green-600 text-white font-semibold rounded-md shadow hover:bg-green-700 transition">
+            <i class="fas fa-plus mr-2"></i> Raise New Ticket
+        </a>
+    </div>
+
+    <!-- Filters bar -->
+    <div class="bg-white shadow rounded-lg p-4">
+        <form method="GET" class="flex flex-col lg:flex-row lg:items-end gap-4">
+            <div class="flex-1">
+                <label class="block text-sm font-medium mb-1">Status</label>
+                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary">
+                    <option value="">All</option>
+                    <option value="open" {% if status_filter == 'open' %}selected{% endif %}>Open</option>
+                    <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="waiting_for_parts" {% if status_filter == 'waiting_for_parts' %}selected{% endif %}>Waiting</option>
+                    <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                    <option value="closed" {% if status_filter == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90 flex items-center">
+                    <i class="fas fa-filter mr-1"></i> Apply
+                </button>
+                <a href="{{ url_for('customer.tickets') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 flex items-center">
+                    <i class="fas fa-times mr-1"></i> Clear
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Ticket cards -->
+    {% if tickets.items %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for ticket in tickets.items %}
+        <div class="bg-white shadow rounded-lg overflow-hidden flex flex-col justify-between">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-semibold">{{ ticket.ticket_number }}</h3>
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full {% if ticket.status == 'open' %}bg-red-100 text-red-800{% elif ticket.status == 'completed' %}bg-green-100 text-green-800{% elif ticket.status == 'in_progress' %}bg-yellow-100 text-yellow-800{% elif ticket.status == 'closed' %}bg-slate-100 text-slate-800{% else %}bg-cyan-100 text-cyan-800{% endif %}">
+                        {{ ticket.status|replace('_', ' ')|upper }}
+                    </span>
+                </div>
+                <p class="text-sm mb-2"><strong>Product:</strong> {{ ticket.product.product_name }}</p>
+                <p class="text-sm mb-2"><strong>Issue:</strong> {{ ticket.issue_description[:60] }}{% if ticket.issue_description|length > 60 %}...{% endif %}</p>
+                <p class="text-sm mb-2"><strong>Priority:</strong>
+                    <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full {% if ticket.priority == 'urgent' %}bg-red-100 text-red-800{% elif ticket.priority == 'high' %}bg-yellow-100 text-yellow-800{% else %}bg-cyan-100 text-cyan-800{% endif %}">
+                        {{ ticket.priority|upper }}
+                    </span>
+                </p>
+                <p class="text-sm"><strong>Created:</strong> {{ ticket.created_at.strftime('%b %d, %Y') }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 flex justify-between items-center">
+                <a href="{{ url_for('customer.ticket_detail', ticket_id=ticket.id) }}" class="px-3 py-1 bg-primary text-white rounded text-sm hover:opacity-90">View</a>
+                {% if ticket.status in ['completed','closed'] and ticket.id not in feedback_ids %}
+                <a href="{{ url_for('customer.add_feedback', ticket_id=ticket.id) }}" class="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:opacity-90">Review</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if tickets.pages > 1 %}
+    <nav aria-label="Page navigation" class="flex justify-center mt-6">
+        <ul class="flex gap-2">
+            {% if tickets.has_prev %}
+            <li>
+                <a class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100" href="{{ url_for('customer.tickets', page=tickets.prev_num, status=status_filter) }}">Prev</a>
+            </li>
+            {% endif %}
+            {% for page_num in tickets.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == tickets.page %}
+                    <li><span class="px-3 py-2 bg-primary text-white rounded">{{ page_num }}</span></li>
+                    {% else %}
+                    <li><a class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100" href="{{ url_for('customer.tickets', page=page_num, status=status_filter) }}">{{ page_num }}</a></li>
+                    {% endif %}
+                {% else %}
+                <li><span class="px-3 py-2 text-gray-400">…</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if tickets.has_next %}
+            <li>
+                <a class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100" href="{{ url_for('customer.tickets', page=tickets.next_num, status=status_filter) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-white shadow rounded-lg p-8 text-center text-gray-600">
+        <i class="fas fa-info-circle text-2xl mb-2"></i>
+        <p class="mt-2">No tickets found.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

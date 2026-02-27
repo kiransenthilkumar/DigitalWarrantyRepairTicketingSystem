@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Activity Logs - Warranty System{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <h2 class="text-2xl font-semibold mb-4"><i class="fas fa-list mr-2"></i>Activity Logs</h2>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-slate-100">
+                <tr>
+                    <th class="py-2 px-3 text-left">User</th>
+                    <th class="py-2 px-3 text-left">Action</th>
+                    <th class="py-2 px-3 text-left">Resource</th>
+                    <th class="py-2 px-3 text-left">Date & Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if logs.items %}
+                    {% for log in logs.items %}
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="py-2 px-3">{{ log.user.full_name }}</td>
+                        <td class="py-2 px-3"><span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">{{ log.action|replace('_', ' ')|upper }}</span></td>
+                        <td class="py-2 px-3">{{ log.resource_type }} #{{ log.resource_id }}</td>
+                        <td class="py-2 px-3">{{ log.created_at.strftime('%b %d, %Y %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-slate-600 py-4">No activity logs found</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% if logs.pages > 1 %}
+    <nav aria-label="Page navigation" class="flex justify-center mt-6">
+        <ul class="flex gap-2">
+            {% if logs.has_prev %}
+            <li>
+                <a class="px-3 py-2 border border-slate-300 rounded hover:bg-slate-100" href="{{ url_for('admin.activity_logs', page=logs.prev_num) }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for page_num in logs.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num == logs.page %}
+                    <li><span class="px-3 py-2 bg-primary text-white rounded">{{ page_num }}</span></li>
+                    {% else %}
+                    <li>
+                        <a class="px-3 py-2 border border-slate-300 rounded hover:bg-slate-100" href="{{ url_for('admin.activity_logs', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li><span class="px-3 py-2 text-slate-400">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if logs.has_next %}
+            <li>
+                <a class="px-3 py-2 border border-slate-300 rounded hover:bg-slate-100" href="{{ url_for('admin.activity_logs', page=logs.next_num) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

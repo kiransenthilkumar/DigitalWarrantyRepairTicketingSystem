@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket Details - Warranty System{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <a href="{{ url_for('technician.tickets') }}" class="inline-flex items-center px-3 py-2 mb-4 border rounded-md hover:bg-slate-100">
+        <i class="fas fa-arrow-left mr-2"></i> Back
+    </a>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            {% if not ticket.is_warranty_covered %}
+            <div class="mb-6 bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-circle text-orange-600 text-xl mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-orange-900">Paid Repair (Not Warranty Covered)</h3>
+                        <p class="text-sm text-orange-700 mt-1\">This is a paid repair. Customer will be charged for the repair costs. Please estimate and confirm before proceeding.</p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-check-circle text-green-600 text-xl mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-green-900">Warranty Covered Repair</h3>
+                        <p class="text-sm text-green-700 mt-1\">This repair is covered under the customer's warranty. No charges to the customer.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Ticket Details -->
+            <div class="bg-white shadow rounded p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-semibold">{{ ticket.ticket_number }}</h2>
+                    <span class="inline-flex items-center px-3 py-1 text-sm font-semibold rounded-full {% if ticket.status == 'open' %}bg-red-100 text-red-800{% elif ticket.status == 'completed' %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                        {{ ticket.status|replace('_', ' ')|upper }}
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <p class="mb-3"><strong>Customer:</strong> {{ customer.full_name }}</p>
+                        <p class="mb-3"><strong>Phone:</strong> {{ customer.phone or 'N/A' }}</p>
+                        <p><strong>Coverage:</strong> <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full {% if ticket.is_warranty_covered %}bg-green-100 text-green-800{% else %}bg-orange-100 text-orange-800{% endif %}">{{ 'WARRANTY' if ticket.is_warranty_covered else 'PAID REPAIR' }}</span></p>                        {% if ticket.is_paid %}
+                        <p class="mb-3"><strong>Payment:</strong> <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Processed</span></p>
+                        {% endif %}                    </div>
+                    <div>
+                        <p class="mb-3"><strong>Product:</strong> {{ product.product_name }}</p>
+                        <p class="mb-3"><strong>Serial:</strong> {{ product.serial_number }}</p>
+                        <p><strong>Priority:</strong> <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800\">{{ ticket.priority|upper }}</span></p>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h3 class="font-semibold mb-2">Issue Description</h3>
+                <p class="text-slate-700 mb-4\">{{ ticket.issue_description }}</p>
+                
+                <div class="flex gap-2 flex-wrap\">
+                    <a href="{{ url_for('technician.update_status', ticket_id=ticket.id) }}" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:opacity-90">
+                        <i class="fas fa-edit mr-2"></i> Update Status
+                    </a>
+                    <a href="{{ url_for('technician.add_note', ticket_id=ticket.id) }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:opacity-90">
+                        <i class="fas fa-note mr-2"></i> Add Note
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Repair Notes -->
+            <div class="bg-white shadow rounded overflow-hidden">
+                <div class="bg-slate-700 text-white p-4">
+                    <h4 class="font-semibold mb-0"><i class="fas fa-list mr-2"></i>Repair Notes ({{ repair_notes|length }})</h4>
+                </div>
+                <div class="p-4">
+                    {% if repair_notes %}
+                    <div class="space-y-4">
+                        {% for note in repair_notes %}
+                        <div class="pb-4 border-b last:border-b-0">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <strong>{{ note.created_by_user.full_name }}</strong>
+                                    <br><small class="text-slate-500">{{ note.created_at.strftime('%B %d, %Y %H:%M') }}</small>
+                                </div>
+                            </div>
+                            <p class="text-slate-700">{{ note.note_text }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-slate-500">No notes yet. <a href="{{ url_for('technician.add_note', ticket_id=ticket.id) }}" class="text-primary hover:underline">Add first note</a></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white shadow rounded p-4 h-fit">
+            <!-- Ticket Info -->
+            <h4 class="font-semibold mb-4"><i class="fas fa-info-circle mr-2"></i>Ticket Info</h4>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <div class="text-slate-500">Created</div>
+                    <div class="font-medium">{{ ticket.created_at.strftime('%b %d, %Y') }}</div>
+                </div>
+                <div>
+                    <div class="text-slate-500">Last Updated</div>
+                    <div class="font-medium">{{ ticket.updated_at.strftime('%b %d, %Y') }}</div>
+                </div>
+                {% if ticket.repair_cost %}
+                <div>
+                    <div class="text-slate-500">Repair Cost</div>
+                    <div class="font-medium">₹{{ ticket.repair_cost }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Customer Feedback -->
+            {% if feedback %}
+            <div class="bg-white shadow rounded mt-6">
+                <div class="px-4 py-2 bg-green-600 text-white flex items-center">
+                    <i class="fas fa-star mr-2"></i> Customer Feedback
+                </div>
+                <div class="p-4">
+                    <strong>Rating:</strong>
+                    <span class="text-yellow-500">
+                        {% for i in range(feedback.rating) %}<i class="fas fa-star"></i>{% endfor %}
+                        {% for i in range(5 - feedback.rating) %}<i class="far fa-star"></i>{% endfor %}
+                    </span>
+                    {% if feedback.comment %}
+                    <p class="mt-2">{{ feedback.comment }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

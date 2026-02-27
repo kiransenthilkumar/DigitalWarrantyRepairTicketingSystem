@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product - Warranty System{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow rounded p-6">
+        <h2 class="text-xl font-semibold mb-4">Register New Product</h2>
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    {{ form.product_name.label(class='block text-sm font-medium') }}
+                    {{ form.product_name(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.brand.label(class='block text-sm font-medium') }}
+                    {{ form.brand(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.category.label(class='block text-sm font-medium') }}
+                    {{ form.category(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.serial_number.label(class='block text-sm font-medium') }}
+                    {{ form.serial_number(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.purchase_date.label(class='block text-sm font-medium') }}
+                    {{ form.purchase_date(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+                <div>
+                    {{ form.warranty_months.label(class='block text-sm font-medium') }}
+                    {{ form.warranty_months(class='mt-1 block w-full rounded-md border-gray-200') }}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ form.description.label(class='block text-sm font-medium') }}
+                {{ form.description(class='mt-1 block w-full rounded-md border-gray-200', rows=4, placeholder='Optional product description') }}
+            </div>
+
+            <div class="mt-4">
+                {{ form.invoice_image.label(class='block text-sm font-medium') }}
+                {{ form.invoice_image(class='mt-1') }}
+                <p class="text-sm text-slate-500">Upload invoice image as proof of purchase (optional)</p>
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-accent text-white rounded-md">Register Product</button>
+                <a href="{{ url_for('customer.products') }}" class="px-4 py-2 border rounded-md">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

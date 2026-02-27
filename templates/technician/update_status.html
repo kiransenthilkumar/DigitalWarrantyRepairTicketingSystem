@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Update Ticket Status - Warranty System{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-8">
+    <div class="bg-white shadow rounded p-6">
+        <h2 class="text-2xl font-semibold mb-4"><i class="fas fa-edit mr-2"></i>Update Ticket Status</h2>
+
+        <div class="mb-4 text-sm text-slate-700">
+            <p><strong>Ticket:</strong> {{ ticket.ticket_number }}</p>
+            <p><strong>Current Status:</strong> <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-primary text-white">{{ ticket.status|replace('_',' ')|upper }}</span></p>
+            {% if not ticket.is_warranty_covered %}
+            <p class="mt-2 text-orange-600"><i class="fas fa-info-circle mr-1"></i>Paid repair — customer will be charged when completed.</p>
+            {% endif %}
+        </div>
+
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="mb-4">
+                {{ form.status.label(class='block text-sm font-medium mb-1') }}
+                {{ form.status(class='mt-1 block w-full rounded-md border-gray-200') }}
+                {% if form.status.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.status.errors[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div class="mb-6">
+                {{ form.repair_cost.label(class='block text-sm font-medium mb-1') }}
+                {{ form.repair_cost(class='mt-1 block w-full rounded-md border-gray-200', placeholder='0.00', step='0.01', type='number') }}
+                {% if form.repair_cost.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.repair_cost.errors[0] }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-accent text-white rounded-md hover:opacity-90">
+                    <i class="fas fa-save mr-1"></i> Submit
+                </button>
+                <a href="{{ url_for('technician.ticket_detail', ticket_id=ticket.id) }}" class="px-4 py-2 border rounded-md hover:bg-slate-100">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
